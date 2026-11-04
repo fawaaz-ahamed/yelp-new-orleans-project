@@ -1,0 +1,5 @@
+.DS_Store
+data/raw/*.json
+*.tar
+*.zip
+.Rproj.user/
