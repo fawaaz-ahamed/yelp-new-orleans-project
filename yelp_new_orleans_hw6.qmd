@@ -12,6 +12,10 @@ format:
 
 Which geographic system provides the most useful way to compare Cajun/Creole, seafood, and Southern restaurants in New Orleans?
 
+## Selected geographic region
+
+I selected **New Orleans, Louisiana, specifically the Orleans Parish area**, as my geographic region. New Orleans is strongly associated with Cajun/Creole, seafood, and Southern food culture, making it a meaningful place to study these restaurant categories. The area also contains enough Yelp businesses to compare restaurant patterns across multiple geographic systems.
+
 ## Selected restaurant categories
 
 I selected Cajun/Creole, seafood, and Southern restaurants because these categories are connected to New Orleans food culture. A restaurant was included if it belonged to at least one of these categories.
