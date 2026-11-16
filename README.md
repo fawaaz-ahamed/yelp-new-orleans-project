@@ -11,8 +11,7 @@ This project analyzes Yelp restaurants and reviews in New Orleans. It focuses on
 The analysis includes 648 selected restaurants and 248,426 reviews. The final report contains the top 10 restaurants, tables, charts, maps, conclusions, limitations, and details about the data-processing methods.
 
 ## View the complete report
-
-[Open the rendered HTML report](yelp_new_orleans.html)
+[Open the rendered HTML report](https://fawaaz-ahamed.github.io/yelp-new-orleans-project/yelp_new_orleans.html)
 
 ## Main findings
 
