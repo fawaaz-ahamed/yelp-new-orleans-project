@@ -1,33 +1,58 @@
 library(jsonlite)
 library(dplyr)
+library(stringr)
 
-# Load the filtered New Orleans restaurants
+# Load all filtered New Orleans restaurants
 new_orleans_restaurants <- readRDS(
   "data/new_orleans/business_new_orleans.rds"
 )
 
-restaurant_ids <- new_orleans_restaurants$business_id
+# Define the selected restaurant categories
+selected_categories <- c(
+  "cajun/creole",
+  "seafood",
+  "southern"
+)
+
+# Keep restaurants belonging to at least one selected category
+selected_restaurants <- new_orleans_restaurants |>
+  filter(
+    !is.na(categories),
+    str_detect(
+      str_to_lower(categories),
+      "(^|,\\s*)(cajun/creole|seafood|southern)(\\s*,|$)"
+    )
+  ) |>
+  distinct(
+    business_id,
+    .keep_all = TRUE
+  )
+
+selected_business_ids <- selected_restaurants$business_id
+
+length(selected_business_ids)
+# Expected result: 648
 
 review_file <- "data/raw/yelp_academic_dataset_review.json"
 
 # Store only matching review chunks
 review_chunks <- list()
 
-review_handler <- function(chunk) {
-  matching_reviews <- chunk[
-    chunk$business_id %in% restaurant_ids,
-    c(
-      "business_id",
-      "user_id",
-      "stars",
-      "date",
-      "text",
-      "useful",
-      "funny",
-      "cool"
-    ),
-    drop = FALSE
-  ]
+review_handler <- function(page) {
+  matching_reviews <- page |>
+    filter(
+      business_id %in% selected_business_ids
+    ) |>
+    select(
+      business_id,
+      user_id,
+      stars,
+      date,
+      text,
+      useful,
+      funny,
+      cool
+    )
   
   if (nrow(matching_reviews) > 0) {
     review_chunks[
@@ -38,26 +63,31 @@ review_handler <- function(chunk) {
   invisible(NULL)
 }
 
-# Read the huge review file in chunks
-jsonlite::stream_in(
-  file(review_file),
-  handler = review_handler,
-  pagesize = 10000,
-  verbose = FALSE
+review_connection <- file(
+  review_file,
+  open = "r"
 )
 
-# Combine the matching chunks
-reviews_new_orleans <- dplyr::bind_rows(review_chunks)
+jsonlite::stream_in(
+  review_connection,
+  pagesize = 5000,
+  handler = review_handler,
+  verbose = TRUE
+)
 
-# Check the result
-dim(reviews_new_orleans)
-head(reviews_new_orleans, 3)
+close(review_connection)
 
-# Save the filtered reviews
+reviews_selected <- bind_rows(review_chunks)
+
+dim(reviews_selected)
+# Expected result: 248426 rows and 9 columns
+
 saveRDS(
-  reviews_new_orleans,
-  "data/new_orleans/reviews_new_orleans.rds",
+  reviews_selected,
+  "data/new_orleans/reviews_selected.rds",
   compress = "xz"
 )
 
-file.exists("data/new_orleans/reviews_new_orleans.rds")
+file.exists(
+  "data/new_orleans/reviews_selected.rds"
+)
